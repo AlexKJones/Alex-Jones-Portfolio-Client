@@ -1,5 +1,7 @@
 import arcade
 import os
+import webbrowser
+# from .sounds import netflixbong
 
 # Constants
 SCREEN_WIDTH = 1000
@@ -67,10 +69,10 @@ class PlayerCharacter(arcade.Sprite):
         # Images from Kenney.nl's Asset Pack 3
         # main_path = ":resources:images/animated_characters/female_adventurer/femaleAdventurer"
         # main_path = ":resources:images/animated_characters/female_person/femalePerson"
-        main_path = ":resources:images/animated_characters/male_person/malePerson"
+        # main_path = ":resources:images/animated_characters/male_person/malePerson"
         # main_path = ":resources:images/animated_characters/male_adventurer/maleAdventurer"
-        # main_path = ":resources:images/animated_characters/zombie/zombie"
-        # main_path = ":resources:images/animated_characters/robot/robot"
+        main_path = ":resources:images/animated_characters/zombie/zombie"
+        # main_path = "images/alex"
 
         # Load textures for idle standing
         self.idle_texture_pair = load_texture_pair(f"{main_path}_idle.png")
@@ -165,12 +167,20 @@ class MyGame(arcade.Window):
 
         # These are 'lists' that keep track of our sprites. Each sprite should
         # go into a list.
+        self.reviewflix_list = None
+        self.github_list = None
+        self.tictactoe_list = None
+        self.drinknight_list = None
+        self.linkedin_list = None
         self.coin_list = None
         self.flag_list = None
         self.wall_list = None
         self.background_list = None
         self.ladder_list = None
         self.player_list = None
+        self.backgroundObj_list = None
+        self.foreground_list = None
+        self.platform_list = None
         self.level = 1
 
         # Separate variable that holds the player sprite
@@ -195,6 +205,7 @@ class MyGame(arcade.Window):
         self.collect_flag_sound = arcade.load_sound(":resources:sounds/upgrade5.wav")
         self.jump_sound = arcade.load_sound(":resources:sounds/jump1.wav")
         self.game_over = arcade.load_sound(":resources:sounds/gameover1.wav")
+        self.netflix_sound = arcade.load_sound(".sounds/netflixbong.mp3")
 
     def setup(self, level):
         """ Set up the game here. Call this function to restart the game. """
@@ -212,6 +223,15 @@ class MyGame(arcade.Window):
         self.wall_list = arcade.SpriteList()
         self.coin_list = arcade.SpriteList()
         self.flag_list = arcade.SpriteList()
+        self.linkedin_list = arcade.SpriteList()
+        self.reviewflix_list = arcade.SpriteList()
+        self.github_list = arcade.SpriteList()
+        self.tictactoe_list = arcade.SpriteList()
+        self.drinknight_list = arcade.SpriteList()
+        self.platform_list = arcade.SpriteList()
+        self.backgroundObj_list = arcade.SpriteList()
+        self.foreground_list = arcade.SpriteList()
+
         
         self.level = 1
 
@@ -223,7 +243,8 @@ class MyGame(arcade.Window):
         self.player_list.append(self.player_sprite)
 
         # --- Load in a map from the tiled editor ---
-
+        backgroundObj_layer_name = 'BackgroundObj'
+        forground_layer_name = 'Foreground'
         # Name of the layer in the file that has our platforms/walls
         platforms_layer_name = 'Platforms'
         moving_platforms_layer_name = 'Moving Platforms'
@@ -231,7 +252,11 @@ class MyGame(arcade.Window):
         # Name of the layer that has items for pick-up
         coins_layer_name = 'Coins'
         flag_layer_name = 'Flag'
-
+        linkedin_layer_name = 'Linkedin'
+        reviewflix_layer_name = 'Reviewflix'
+        github_layer_name = 'Github'
+        tictactoe_layer_name = 'Tictactoe'
+        drinknight_layer_name = 'Drink Night'
         # Map name
         map_name = f"maps/maps{level}.tmx"
 
@@ -244,6 +269,10 @@ class MyGame(arcade.Window):
         # -- Platforms
         self.wall_list = arcade.tilemap.process_layer(my_map,
                                                       platforms_layer_name,
+                                                      TILE_SCALING,
+                                                      use_spatial_hash=True)
+        self.platform_list = arcade.tilemap.process_layer(my_map,
+                                                      "Platforms",
                                                       TILE_SCALING,
                                                       use_spatial_hash=True)
 
@@ -259,6 +288,10 @@ class MyGame(arcade.Window):
         self.ladder_list = arcade.tilemap.process_layer(my_map, "Ladders",
                                                         TILE_SCALING,
                                                         use_spatial_hash=True)
+        self.backgroundObj_list = arcade.tilemap.process_layer(my_map, "BackgroundObj",
+                                                        TILE_SCALING)
+        self.foreground_list = arcade.tilemap.process_layer(my_map, "Foreground",
+                                                        TILE_SCALING)
 
         # -- Coins
         self.coin_list = arcade.tilemap.process_layer(my_map, coins_layer_name,
@@ -267,6 +300,26 @@ class MyGame(arcade.Window):
 
         # -- Flag
         self.flag_list = arcade.tilemap.process_layer(my_map, flag_layer_name,
+                                                      TILE_SCALING,
+                                                      use_spatial_hash=True)
+        # -- linkedin
+        self.linkedin_list = arcade.tilemap.process_layer(my_map, linkedin_layer_name,
+                                                      TILE_SCALING,
+                                                      use_spatial_hash=True)
+        # -- reviewflix
+        self.reviewflix_list = arcade.tilemap.process_layer(my_map, reviewflix_layer_name,
+                                                      TILE_SCALING,
+                                                      use_spatial_hash=True)
+        # -- github
+        self.github_list = arcade.tilemap.process_layer(my_map, github_layer_name,
+                                                      TILE_SCALING,
+                                                      use_spatial_hash=True)
+        # -- tictactoe
+        self.tictactoe_list = arcade.tilemap.process_layer(my_map, tictactoe_layer_name,
+                                                      TILE_SCALING,
+                                                      use_spatial_hash=True)
+        # -- drinknight
+        self.drinknight_list = arcade.tilemap.process_layer(my_map, drinknight_layer_name,
                                                       TILE_SCALING,
                                                       use_spatial_hash=True)
 
@@ -294,6 +347,14 @@ class MyGame(arcade.Window):
         self.coin_list.draw()
         self.player_list.draw()
         self.flag_list.draw()
+        self.linkedin_list.draw()
+        self.reviewflix_list.draw()
+        self.github_list.draw()
+        self.tictactoe_list.draw()
+        self.drinknight_list.draw()
+        self.platform_list.draw()
+        self.backgroundObj_list.draw()
+        self.foreground_list.draw()
 
         # Draw our score on the screen, scrolling it with the viewport
         score_text = f"Score: {self.score}"
@@ -389,6 +450,14 @@ class MyGame(arcade.Window):
         self.background_list.update_animation(delta_time)
         self.player_list.update_animation(delta_time)
         self.flag_list.update_animation(delta_time)
+        self.linkedin_list.update_animation(delta_time)
+        self.reviewflix_list.update_animation(delta_time)
+        self.github_list.update_animation(delta_time)
+        self.tictactoe_list.update_animation(delta_time)
+        self.drinknight_list.update_animation(delta_time)
+        self.platform_list.update_animation(delta_time)
+        self.backgroundObj_list.update_animation(delta_time)
+        self.foreground_list.update_animation(delta_time)
 
         # Update walls, used with moving platforms
         self.wall_list.update()
@@ -422,6 +491,66 @@ class MyGame(arcade.Window):
             # Remove the coin
             coin.remove_from_sprite_lists()
             arcade.play_sound(self.collect_coin_sound)
+            
+        # See if we hit any linkedins
+        linkedin_hit_list = arcade.check_for_collision_with_list(self.player_sprite,
+                                                             self.linkedin_list)
+
+        # Loop through each coin we hit (if any) and remove it
+        for linkedin in linkedin_hit_list:
+                self.score+= 10
+                webbrowser.open('https://www.linkedin.com/in/alexthejones/', new=2)
+                
+                linkedin.remove_from_sprite_lists()
+                arcade.play_sound(self.collect_flag_sound)
+
+        # See if we hit reviewflix
+        reviewflix_hit_list = arcade.check_for_collision_with_list(self.player_sprite,
+                                                             self.reviewflix_list)
+
+        # Loop through each coin we hit (if any) and remove it
+        for reviewflix in reviewflix_hit_list:
+                self.score+= 10
+                webbrowser.open('https://did-you-restart.github.io/reviewflix-client/#/', new=2)
+                
+                reviewflix.remove_from_sprite_lists()
+                arcade.play_sound(self.netflix_sound)
+                
+        # See if we hit github
+        github_hit_list = arcade.check_for_collision_with_list(self.player_sprite,
+                                                             self.github_list)
+
+        # Loop through each coin we hit (if any) and remove it
+        for github in github_hit_list:
+                self.score+= 10
+                webbrowser.open('https://github.com/AlexKJones', new=2)
+                
+                github.remove_from_sprite_lists()
+                arcade.play_sound(self.collect_flag_sound)
+                
+        # See if we hit tictactoe
+        tictactoe_hit_list = arcade.check_for_collision_with_list(self.player_sprite,
+                                                             self.tictactoe_list)
+
+        # Loop through each coin we hit (if any) and remove it
+        for tictactoe in tictactoe_hit_list:
+                self.score+= 10
+                webbrowser.open('https://alexkjones.github.io/tictactoe-alexjones/', new=2)
+                
+                tictactoe.remove_from_sprite_lists()
+                arcade.play_sound(self.collect_flag_sound)
+                
+        # See if we hit drinknight
+        drinknight_hit_list = arcade.check_for_collision_with_list(self.player_sprite,
+                                                             self.drinknight_list)
+
+        # Loop through each coin we hit (if any) and remove it
+        for drinknight in drinknight_hit_list:
+                self.score+= 10
+                webbrowser.open('https://alexkjones.github.io/Drink-Night-Client/', new=2)
+                
+                drinknight.remove_from_sprite_lists()
+                arcade.play_sound(self.collect_flag_sound)
 
         # See if we hit the flag
         flag_hit_list = arcade.check_for_collision_with_list(self.player_sprite,
