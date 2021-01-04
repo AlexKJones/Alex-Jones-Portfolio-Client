@@ -6,7 +6,7 @@ Technologies Used: Python, PyGame, Arcade, Tiled, Photoshop, Illustrator, PyChar
 
 Unsolved Problems: Displayable in browser, to view you must fork and clone this repo, install dependencies from npm and python then run in the python console.
 
-Wireframe: [Imgur](https://i.imgur.com/ca4QXrB.jpg)  [Imgur](https://i.imgur.com/1gAzIqG.jpg)
+Wireframe: [Gamescreen](https://i.imgur.com/ca4QXrB.jpg)  [PauseScreen](https://i.imgur.com/1gAzIqG.jpg)
 
 Screenshots: 
 
